@@ -10,7 +10,6 @@ namespace TCPServer
 	{
 		int port;
 
-
 		public static bool ValidPort(int port)
 		{
 			return (port > 0 && port < 65535) ? true : false;

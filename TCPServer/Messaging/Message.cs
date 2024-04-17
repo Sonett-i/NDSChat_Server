@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TCPServer.Data;
 
-namespace TCPServer.structs
+namespace TCPServer.Messaging
 {
-	class User
+	internal class Message
 	{
 	}
 }

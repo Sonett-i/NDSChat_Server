@@ -5,8 +5,9 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using Libs.Terminal;
-using TCPServer.structs;
 using TCPServer.Logging;
+using TCPServer.Data;
+using TCPServer.UserData;
 
 namespace TCPServer
 {
@@ -16,6 +17,8 @@ namespace TCPServer
         private bool running = true;
         private Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         private List<ClientSocket> clientSockets = new List<ClientSocket>();
+
+        Users connectedClients = new Users();
 
         public Server(int port)
         {
@@ -75,15 +78,18 @@ namespace TCPServer
 
         private void HandleNewClient(Socket joiningSocket)
         {
-            ClientSocket newClientSocket = new ClientSocket { socket = joiningSocket };
-            clientSockets.Add(newClientSocket);
-            joiningSocket.BeginReceive(newClientSocket.buffer, 0, ClientSocket.BUFFER_SIZE, SocketFlags.None, ReceiveCallback, newClientSocket);
-            Log.Event("Client connected");
+            User newUser = new User("");
+            ClientSocket newClientSocket = new ClientSocket { socket = joiningSocket, user = newUser };
+            
+            connectedClients.AddUser(newClientSocket);
+
+            newClientSocket.socket.BeginReceive(newClientSocket.buffer, 0, ClientSocket.BUFFER_SIZE, SocketFlags.None, ReceiveCallback, newClientSocket);
+            Log.Event($"{newClientSocket.socket.RemoteEndPoint.ToString()} connected.");
         }
 
         private void ReceiveCallback(IAsyncResult AR)
         {
-            ClientSocket currentClientSocket = (ClientSocket)AR.AsyncState;
+            ClientSocket? currentClientSocket = (ClientSocket)AR.AsyncState;
             int received = ClientSocket.BUFFER_SIZE;
 
             try
