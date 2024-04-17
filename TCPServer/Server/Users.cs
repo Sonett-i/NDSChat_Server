@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TCPServer.UserData;
+using TCPServer.Client;
 
-namespace TCPServer.Data
+namespace TCPServer.ServerData
 {
-	internal class Users
+	internal class ServerUsers
 	{
 		List<ClientSocket> connectedClients = new List<ClientSocket>();
 

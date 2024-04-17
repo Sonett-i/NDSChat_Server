@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TCPServer.UserData
+namespace TCPServer.Client
 {
 	public static class UserGroup
 	{

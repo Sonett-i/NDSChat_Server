@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TCPServer.Data;
-using TCPServer.UserData;
+using TCPServer.Client;
 
 namespace TCPServer.Messaging
 {

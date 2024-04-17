@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net;
 
-namespace TCPServer.UserData
+namespace TCPServer.Client
 {
 	public class User
 	{

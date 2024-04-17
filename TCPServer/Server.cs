@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 using Libs.Terminal;
 using TCPServer.Logging;
 using TCPServer.Data;
-using TCPServer.UserData;
+using TCPServer.Client;
+using TCPServer.ServerData;
 
 namespace TCPServer
 {
@@ -18,7 +19,7 @@ namespace TCPServer
         private Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         private List<ClientSocket> clientSockets = new List<ClientSocket>();
 
-        Users connectedClients = new Users();
+        ServerUsers connectedClients = new ServerUsers();
 
         public Server(int port)
         {
@@ -36,7 +37,7 @@ namespace TCPServer
             serverSocket.Listen(0);
 
             Log.Event($"Server bound to: {IPAddress.Any}:{port}...");
-
+            Log.Event($"Listening...");
             while (!cancellationToken.IsCancellationRequested)
             {
                 Socket joiningSocket = await AcceptAsync(cancellationToken);
@@ -53,7 +54,6 @@ namespace TCPServer
                 tcs.TrySetCanceled();
             });
 
-            Log.Event($"Listening...");
             serverSocket.BeginAccept(asyncResult =>
             {
                 if (cancellationToken.IsCancellationRequested)
