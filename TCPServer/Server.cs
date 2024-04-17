@@ -98,7 +98,7 @@ namespace TCPServer
             }
             catch (SocketException)
             {
-                Log.Event("Client disconnected");
+                Log.Event($"{currentClientSocket.socket.RemoteEndPoint.ToString()} disconnected");
                 currentClientSocket.socket.Close();
                 clientSockets.Remove(currentClientSocket);
                 return;
@@ -110,6 +110,10 @@ namespace TCPServer
             string text = ClientSocket.encoding.GetString(buffer);
 
             Terminal.Print(text);
+
+            currentClientSocket.socket.BeginReceive(currentClientSocket.buffer, 0, ClientSocket.BUFFER_SIZE, SocketFlags.None, ReceiveCallback, currentClientSocket);
+
+            SendToAll(text, currentClientSocket);
         }
 
         public void SendToAll(string message, ClientSocket sender)
