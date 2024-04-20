@@ -9,7 +9,7 @@ namespace TCPServer.Messaging
 	static class SerializedData
 	{
 		public static char field = (char)29; // ASCII field separator
-		public static char record = (char)30; // ASCII record separator
+		public static char record = '\0'; // ASCII record separator
 
 		/* Message Structure:
 		 * 
@@ -28,15 +28,24 @@ namespace TCPServer.Messaging
 			return serialized;
 		}
 
+		public static string Sanitize(string message)
+		{
+			string output = message.Replace(record.ToString(), "");
+			return output;
+		}
+
 		public static Message Decode(string data)
 		{
-			data = data.Replace(record, '\0');
-			string[] received = data.Split(field);
-
+			//data = data.Replace(record, '\0');
 			Message message = new Message();
-			message.sender = received[0];
-			message.messageType = (Message.MessageType)int.Parse(received[1]);
-			message.content = received[2];
+
+			string[] received = data.Split(field);
+			if (received.Length == 3)
+			{
+				message.sender = received[0];
+				message.messageType = (Message.MessageType)int.Parse(received[1]);
+				message.content = Sanitize(received[2]);
+			}
 
 			return message;
 		}

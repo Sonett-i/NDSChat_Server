@@ -25,8 +25,5 @@ namespace TCPServer.Client
 		{
 			return socket.RemoteEndPoint;
 		}
-
-
-
 	}
 }

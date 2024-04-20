@@ -53,7 +53,7 @@ namespace TCPServer.Messaging
 
 			if (message.messageType == MessageType.MESSAGE_TYPE_ANNOUNCEMENT)
 			{
-
+				Events.HandleEvent(message);
 			}
 
 			return message;

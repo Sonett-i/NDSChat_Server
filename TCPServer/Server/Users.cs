@@ -23,7 +23,9 @@ namespace TCPServer.ServerData
 		public void AddUser(ClientSocket socket)
 		{
 			if (!connectedClients.Contains(socket))
+			{
 				connectedClients.Add(socket);
+			}
 		}
 
 		public void RemoveUser(ClientSocket socket)

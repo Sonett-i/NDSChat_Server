@@ -11,12 +11,13 @@ namespace TCPServer.Client
 	{
 		int id;
 		string username = "guest";
-		IPAddress address = null;
+		public string remoteAddress = "";
 		UserGroup.SecLevel secLevel;
 
-		public User(string username)
+		public User(string username, string IP)
 		{
 			this.username = username;
+			this.remoteAddress = IP;
 			SetSecurityLevel();
 		}
 
@@ -33,6 +34,11 @@ namespace TCPServer.Client
 		public int GetID()
 		{
 			return id;
+		}
+
+		public void SetID(int id)
+		{
+			this.id = id;
 		}
 
 		private void SetSecurityLevel()

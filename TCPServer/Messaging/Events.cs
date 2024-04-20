@@ -21,5 +21,14 @@ namespace TCPServer.Messaging
 			[EventType.EVENT_DISCONNECTED] = "DISCONNECTED",
 			[EventType.EVENT_NAME_CHANGED] = "NAME CHANGED",
 		};
+
+		public static void HandleEvent(Message message)
+		{
+			if (message.content == "JOINED")
+			{
+				message.clientSocket.user.SetName(message.sender);
+				Server.connectedClients.AddUser(message.clientSocket);
+			}
+		}
 	}
 }

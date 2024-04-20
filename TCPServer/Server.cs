@@ -81,13 +81,13 @@ namespace TCPServer
 
         private void HandleNewClient(Socket joiningSocket)
         {
-            User newUser = new User("");
+            User newUser = new User("guest", joiningSocket.RemoteEndPoint.ToString());
             ClientSocket newClientSocket = new ClientSocket { socket = joiningSocket, user = newUser };
             
             connectedClients.AddUser(newClientSocket);
 
             newClientSocket.socket.BeginReceive(newClientSocket.buffer, 0, ClientSocket.BUFFER_SIZE, SocketFlags.None, ReceiveCallback, newClientSocket);
-            Log.Event($"{newClientSocket.socket.RemoteEndPoint.ToString()} connected.", Log.LogType.LOG_EVENT);
+            Log.Event($"{newClientSocket.user.remoteAddress} connected.", Log.LogType.LOG_EVENT);
         }
 
         // Async Callback
@@ -102,7 +102,7 @@ namespace TCPServer
             }
             catch (SocketException)
             {
-                Log.Event($"{currentClientSocket.socket.RemoteEndPoint.ToString()} disconnected", Log.LogType.LOG_EVENT);
+                Log.Event($"{currentClientSocket.user.remoteAddress} disconnected", Log.LogType.LOG_EVENT);
                 currentClientSocket.socket.Close();
                 connectedClients.RemoveUser(currentClientSocket);
                 return;
@@ -126,10 +126,8 @@ namespace TCPServer
                 else
 				{
                     message.Send();
-				}
-                
-            }
-                
+				}   
+            } 
         }
 
         // Send to all
