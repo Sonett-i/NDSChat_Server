@@ -7,7 +7,7 @@ using TCPServer.Client;
 
 namespace TCPServer.ServerData
 {
-	internal class ServerUsers
+	public class ServerUsers
 	{
 		List<ClientSocket> connectedClients = new List<ClientSocket>();
 
@@ -24,6 +24,17 @@ namespace TCPServer.ServerData
 		{
 			if (!connectedClients.Contains(socket))
 				connectedClients.Add(socket);
+		}
+
+		public void RemoveUser(ClientSocket socket)
+		{
+			if (connectedClients.Contains(socket))
+				connectedClients.Remove(socket);
+		}
+
+		public List<ClientSocket> GetUsers()
+		{
+			return connectedClients;
 		}
 	}
 }

@@ -9,7 +9,8 @@ namespace TCPServer.Client
 {
 	public class User
 	{
-		string username = "null";
+		int id;
+		string username = "guest";
 		IPAddress address = null;
 		UserGroup.SecLevel secLevel;
 
@@ -17,6 +18,21 @@ namespace TCPServer.Client
 		{
 			this.username = username;
 			SetSecurityLevel();
+		}
+
+		public string GetName()
+		{
+			return username;
+		}
+
+		public void SetName(string newName)
+		{
+			this.username = newName;
+		}
+
+		public int GetID()
+		{
+			return id;
 		}
 
 		private void SetSecurityLevel()
@@ -34,5 +50,6 @@ namespace TCPServer.Client
 				// to-do server sets sec level.
 			}
 		}
+
 	}
 }

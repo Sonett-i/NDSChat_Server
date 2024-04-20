@@ -6,9 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Libs.Terminal;
 using TCPServer.Logging;
-using TCPServer.Data;
 using TCPServer.Client;
 using TCPServer.ServerData;
+using TCPServer.Messaging;
 
 namespace TCPServer
 {
@@ -17,9 +17,11 @@ namespace TCPServer
         public int port;
         private bool running = true;
         private Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-        private List<ClientSocket> clientSockets = new List<ClientSocket>();
 
-        ServerUsers connectedClients = new ServerUsers();
+        // Want this accessible by other sections of code.
+        //public static List<ClientSocket> clientSockets = new List<ClientSocket>();
+
+        public static ServerUsers connectedClients = new ServerUsers();
 
         public Server(int port)
         {
@@ -36,8 +38,9 @@ namespace TCPServer
             serverSocket.Bind(new IPEndPoint(IPAddress.Any, port));
             serverSocket.Listen(0);
 
-            Log.Event($"Server bound to: {IPAddress.Any}:{port}...");
-            Log.Event($"Listening...");
+            Log.Event($"Server bound to: {IPAddress.Any}:{port}...", Log.LogType.LOG_EVENT);
+            Log.Event($"Listening...", Log.LogType.LOG_EVENT);
+
             while (!cancellationToken.IsCancellationRequested)
             {
                 Socket joiningSocket = await AcceptAsync(cancellationToken);
@@ -84,9 +87,10 @@ namespace TCPServer
             connectedClients.AddUser(newClientSocket);
 
             newClientSocket.socket.BeginReceive(newClientSocket.buffer, 0, ClientSocket.BUFFER_SIZE, SocketFlags.None, ReceiveCallback, newClientSocket);
-            Log.Event($"{newClientSocket.socket.RemoteEndPoint.ToString()} connected.");
+            Log.Event($"{newClientSocket.socket.RemoteEndPoint.ToString()} connected.", Log.LogType.LOG_EVENT);
         }
 
+        // Async Callback
         private void ReceiveCallback(IAsyncResult AR)
         {
             ClientSocket? currentClientSocket = (ClientSocket)AR.AsyncState;
@@ -98,37 +102,49 @@ namespace TCPServer
             }
             catch (SocketException)
             {
-                Log.Event($"{currentClientSocket.socket.RemoteEndPoint.ToString()} disconnected");
+                Log.Event($"{currentClientSocket.socket.RemoteEndPoint.ToString()} disconnected", Log.LogType.LOG_EVENT);
                 currentClientSocket.socket.Close();
-                clientSockets.Remove(currentClientSocket);
+                connectedClients.RemoveUser(currentClientSocket);
                 return;
             }
 
             byte[] buffer = new byte[received];
             Array.Copy(currentClientSocket.buffer, buffer, received);
 
-            string text = ClientSocket.encoding.GetString(buffer);
-
-            Terminal.Print(text);
+            Message message = Message.Receive(buffer, currentClientSocket);
 
             currentClientSocket.socket.BeginReceive(currentClientSocket.buffer, 0, ClientSocket.BUFFER_SIZE, SocketFlags.None, ReceiveCallback, currentClientSocket);
 
-            SendToAll(text, currentClientSocket);
+            if (message != null)
+			{
+                Log.Event(message.Format(), Log.LogType.LOG_MESSAGE);
+
+                if (message.messageType == Message.MessageType.MESSAGE_TYPE_DEFAULT)
+				{
+                    SendToAll(message, currentClientSocket);
+                }
+                else
+				{
+                    message.Send();
+				}
+                
+            }
+                
         }
 
-        public void SendToAll(string message, ClientSocket sender)
+        // Send to all
+        public void SendToAll(Message message, ClientSocket sender)
         {
-            foreach (ClientSocket client in clientSockets)
+            foreach (ClientSocket client in connectedClients.GetUsers())
             {
                 if (client == sender)
                     continue;
 
-                byte[] data = Encoding.UTF8.GetBytes(message);
-                client.socket.Send(data);
+                message.Send(client);
             }
         }
 
-
+        // Shutdown procedure
         public void Shutdown()
 		{
             Terminal.Print("Server shutting down...");
