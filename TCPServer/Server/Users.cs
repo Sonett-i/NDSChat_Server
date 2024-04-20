@@ -38,5 +38,18 @@ namespace TCPServer.ServerData
 		{
 			return connectedClients;
 		}
+
+		public bool UserExists(string user)
+		{
+			foreach (ClientSocket client in connectedClients)
+			{
+				if (client.user.GetName() == user)
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
 	}
 }

@@ -113,21 +113,21 @@ namespace TCPServer
 
             Message message = Message.Receive(buffer, currentClientSocket);
 
-            currentClientSocket.socket.BeginReceive(currentClientSocket.buffer, 0, ClientSocket.BUFFER_SIZE, SocketFlags.None, ReceiveCallback, currentClientSocket);
-
             if (message != null)
-			{
+            {
                 Log.Event(message.Format(), Log.LogType.LOG_MESSAGE);
 
-                if (message.messageType == Message.MessageType.MESSAGE_TYPE_DEFAULT)
-				{
+                if (message.messageType == Message.MessageType.MESSAGE_TYPE_DEFAULT || message.messageType == Message.MessageType.MESSAGE_TYPE_ANNOUNCEMENT)
+                {
                     SendToAll(message, currentClientSocket);
                 }
                 else
-				{
+                {
                     message.Send();
-				}   
-            } 
+                }
+            }
+
+            currentClientSocket.socket.BeginReceive(currentClientSocket.buffer, 0, ClientSocket.BUFFER_SIZE, SocketFlags.None, ReceiveCallback, currentClientSocket);
         }
 
         // Send to all

@@ -40,6 +40,7 @@ namespace TCPServer.Messaging
 			Message message = new Message();
 
 			string[] received = data.Split(field);
+
 			if (received.Length == 3)
 			{
 				message.sender = received[0];

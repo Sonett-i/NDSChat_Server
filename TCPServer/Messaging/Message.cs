@@ -45,13 +45,14 @@ namespace TCPServer.Messaging
 		public static Message? Receive(byte[] received, ClientSocket client)
 		{
 			Message message = SerializedData.Decode(Message.encoding.GetString(received));
+
 			message.clientSocket = client;
+
 			if (message.messageType == MessageType.MESSAGE_TYPE_COMMAND)
 			{
 				Commands.HandleCommand(message);
 			}
-
-			if (message.messageType == MessageType.MESSAGE_TYPE_ANNOUNCEMENT)
+			else if (message.messageType == MessageType.MESSAGE_TYPE_ANNOUNCEMENT)
 			{
 				Events.HandleEvent(message);
 			}
