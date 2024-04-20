@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using TCPServer.Logging;
 using TCPServer.Client;
 using TCPServer.Messaging;
+using TCPServer.Logging;
 
 namespace TCPServer.Messaging
 {
@@ -20,6 +21,7 @@ namespace TCPServer.Messaging
 			COMMAND_SET_SECLVL,
 			COMMAND_USERNAME,
 			COMMAND_COMMANDS,
+			COMMAND_KICK,
 			COMMAND_INVALID
 		}
 
@@ -33,6 +35,20 @@ namespace TCPServer.Messaging
 			[Command.COMMAND_WHISPER] = "whisper",
 			[Command.COMMAND_SET_SECLVL] = "promote",
 			[Command.COMMAND_USERNAME] = "username",
+			[Command.COMMAND_KICK] = "kick",
+			[Command.COMMAND_COMMANDS] = "commands",
+		};
+
+		public static Dictionary<Command, string> commandDetails = new Dictionary<Command, string>()
+		{
+			[Command.COMMAND_USERINFO] = "Prints out users information, IP, SecLvl, username.",
+			[Command.COMMAND_WHO] = "Returns a list of connected users.",
+			[Command.COMMAND_ABOUT] = "Prints information about this chat application.",
+			[Command.COMMAND_WHISPER] = "Message another client directly.",
+			[Command.COMMAND_SET_SECLVL] = "Promote a user to moderator.",
+			[Command.COMMAND_USERNAME] = "Change your username.",
+			[Command.COMMAND_KICK] = "Kick another user.",
+			[Command.COMMAND_COMMANDS] = "Lists all available commands",
 		};
 
 		public delegate Message CommandDelegate(Message message, string[] args);
@@ -42,9 +58,10 @@ namespace TCPServer.Messaging
 			[Command.COMMAND_WHO] = (message, args) => Who(message),
 			[Command.COMMAND_USERNAME] = (message, args) => Username(message, args),
 			[Command.COMMAND_USERINFO] = (message, args) => Placeholder(message),
-			[Command.COMMAND_ABOUT] = (message, args) => Placeholder(message),
-			[Command.COMMAND_WHISPER] = (message, args) => Placeholder(message),
-			[Command.COMMAND_SET_SECLVL] = (message, args) => Placeholder(message),
+			[Command.COMMAND_ABOUT] = (message, args) => About(message),
+			[Command.COMMAND_WHISPER] = (message, args) => Whisper(message, args),
+			[Command.COMMAND_SET_SECLVL] = (message, args) => Promote(message, args),
+			[Command.COMMAND_COMMANDS] = (message, args) => ListCommands(message),
 		};
 
 		// iterates through commandStrings dictionary and returns enum if match.
@@ -78,6 +95,12 @@ namespace TCPServer.Messaging
 			if (command != Command.COMMAND_INVALID)
 			{
 				commands[command].Invoke(message, args);
+
+				Log.Event($"[{message.sender}] used the {commandStrings[command]} command.", Log.LogType.LOG_COMMAND);
+			}
+			else
+			{
+				message.content = "Error: Invalid Command";
 			}
 
 			return message;
@@ -122,13 +145,64 @@ namespace TCPServer.Messaging
 			return message;
 		}
 
-		public static void Whisper()
+		public static Message ListCommands(Message message)
 		{
+			string output = "Commands: ";
 
+			foreach (KeyValuePair<Command, string> kvp in commandDetails)
+			{
+				output += "\n!" + commandStrings[kvp.Key] + ": " + kvp.Value;
+			}
+
+			message.content = output;
+
+			return message;
 		}
-		public static void About()
-		{
 
+		public static Message Whisper(Message message, string[] args)
+		{
+			if (args.Length < 2)
+			{
+				return message;
+			}
+
+			string target = args[1];
+
+			ClientSocket targetClient = Server.connectedClients.GetUser(target);
+
+			if (targetClient != null)
+			{
+				string messageStr = "";
+
+				for (int i = 2; i < args.Length; i++)
+				{
+					messageStr += args[i] + " ";
+				}
+
+				message.content = messageStr;
+
+				message.messageType = Message.MessageType.MESSAGE_TYPE_WHISPER;
+
+				message.Send(targetClient);
+			}
+
+			return message;
+		}
+
+		public static Message About(Message message)
+		{
+			message.content = $"[NDSChat v.0.1]: a TCP chat application developed by Sam Catcheside, circa 2024 as part of the NDS203 subject at Torrens University.";
+			return message;
+		}
+
+		public static Message Promote(Message message, string[] args)
+		{
+			return message;
+		}
+
+		public static Message Kick(Message message, string[] args)
+		{
+			return message;
 		}
 	}
 }

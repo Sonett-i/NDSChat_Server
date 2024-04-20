@@ -115,10 +115,9 @@ namespace TCPServer
 
             if (message != null)
             {
-                Log.Event(message.Format(), Log.LogType.LOG_MESSAGE);
-
                 if (message.messageType == Message.MessageType.MESSAGE_TYPE_DEFAULT || message.messageType == Message.MessageType.MESSAGE_TYPE_ANNOUNCEMENT)
                 {
+                    Log.Event(message.Format(), Log.LogType.LOG_MESSAGE);
                     SendToAll(message, currentClientSocket);
                 }
                 else

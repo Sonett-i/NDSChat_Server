@@ -11,13 +11,16 @@ namespace TCPServer.ServerData
 	{
 		List<ClientSocket> connectedClients = new List<ClientSocket>();
 
-		public User GetUser(int ID)
+		public ClientSocket GetUser(string username)
 		{
+			foreach (ClientSocket client in connectedClients)
+			{
+				if (client.user.GetName() == username)
+				{
+					return client;
+				}
+			}
 			return null;
-		}
-		public User GetUser(string username)
-		{
-			return GetUser(0);
 		}
 
 		public void AddUser(ClientSocket socket)
