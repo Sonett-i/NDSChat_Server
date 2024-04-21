@@ -11,6 +11,11 @@ namespace TCPServer.ServerData
 	{
 		List<ClientSocket> connectedClients = new List<ClientSocket>();
 
+		// To-do for ass3: make mod and admin check happen with database transaction.
+
+		List<string> admins = new List<string>() { "Sam" };
+		List<string> moderators = new List<string>() { "Lisa" };
+
 		public ClientSocket GetUser(string username)
 		{
 			foreach (ClientSocket client in connectedClients)
@@ -28,6 +33,19 @@ namespace TCPServer.ServerData
 			if (!connectedClients.Contains(socket))
 			{
 				connectedClients.Add(socket);
+			}
+		}
+
+		public void UpdateUser(ClientSocket socket)
+		{
+			if (admins.Contains(socket.user.GetName()))
+			{
+				socket.user.secLevel = UserGroup.SecLevel.SEC_LVL_ADMIN;
+			}
+
+			if (moderators.Contains(socket.user.GetName()))
+			{
+				socket.user.secLevel = UserGroup.SecLevel.SEC_LVL_MODERATOR;
 			}
 		}
 
@@ -96,7 +114,7 @@ namespace TCPServer.ServerData
 			{
 				if (client.user.secLevel >= UserGroup.SecLevel.SEC_LVL_MODERATOR)
 				{
-					output += $"{client.user.GetName()} [{UserGroup.rankNames[client.user.secLevel]}]";
+					output += $"\n{client.user.GetName()} [{UserGroup.rankNames[client.user.secLevel]}]";
 				}
 			}
 
@@ -104,3 +122,7 @@ namespace TCPServer.ServerData
 		}
 	}
 }
+
+/*  Author: Sam Catcheside, A00115110
+ *  Date: 21/04/2024
+ */

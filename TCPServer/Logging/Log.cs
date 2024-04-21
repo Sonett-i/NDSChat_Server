@@ -40,3 +40,7 @@ namespace TCPServer.Logging
 		}
 	}
 }
+
+/*  Author: Sam Catcheside, A00115110
+ *  Date: 21/04/2024
+ */

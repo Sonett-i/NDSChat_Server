@@ -149,7 +149,6 @@ namespace TCPServer.Messaging
 				message.content = $"{originalName} changed their name to: {message.clientSocket.user.GetName()}";
 
 				Message.CommandMessage(message.clientSocket, "!" + message.clientSocket.user.UserInfo());
-				Message.CommandMessage(message.clientSocket, $"Successfully changed name to: {newName}");
 			}
 			else
 			{
@@ -220,6 +219,12 @@ namespace TCPServer.Messaging
 		// Task 5
 		public static Message Promote(Message message, string[] args)
 		{
+			if (message.clientSocket.user.secLevel < UserGroup.SecLevel.SEC_LVL_MODERATOR)
+			{
+				message.content = "You do not have permission to do this.";
+				return message;
+			}
+
 			if (args.Length == 2)
 			{
 				ClientSocket target = Server.connectedClients.GetUser(args[1]);
@@ -248,6 +253,12 @@ namespace TCPServer.Messaging
 		// Task 5
 		public static Message Demote(Message message, string[] args)
 		{
+			if (message.clientSocket.user.GetName() != "server" || message.clientSocket.user.secLevel < UserGroup.SecLevel.SEC_LVL_MODERATOR)
+			{
+				message.content = "You do not have permission to do this.";
+				return message;
+			}
+
 			if (args.Length == 2)
 			{
 				ClientSocket target = Server.connectedClients.GetUser(args[1]);
@@ -329,9 +340,10 @@ namespace TCPServer.Messaging
 		public static Message Mods(Message message)
 		{
 			string mods = Server.connectedClients.GetMods();
-			message.content = "Available moderators: \n" + mods;
+			message.content = "Available moderators:" + mods;
 			return message;
 		}
+
 		public static Message UserInfo(Message message, string[] args)
 		{
 			string target = "";
@@ -359,3 +371,7 @@ namespace TCPServer.Messaging
 		}
 	}
 }
+
+/*  Author: Sam Catcheside, A00115110
+ *  Date: 21/04/2024
+ */

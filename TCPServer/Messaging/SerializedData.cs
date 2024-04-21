@@ -23,7 +23,7 @@ namespace TCPServer.Messaging
 		{
 			string serialized = $"{message.sender}{field}"
 				+ $"{(int)message.messageType}{field}"
-				+ $"{message.content}{record}";
+				+ $"{message.content}";
 
 			return serialized;
 		}
@@ -52,3 +52,7 @@ namespace TCPServer.Messaging
 		}
 	}
 }
+
+/*  Author: Sam Catcheside, A00115110
+ *  Date: 21/04/2024
+ */

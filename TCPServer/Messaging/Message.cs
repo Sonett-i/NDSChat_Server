@@ -83,6 +83,7 @@ namespace TCPServer.Messaging
 			client.socket.Send(data, 0, data.Length, SocketFlags.None);
 		}
 
+		// Task 1
 		public string Format()
 		{
 			return $"[{this.clientSocket.user.GetName()}][{Message.messageTypes[this.messageType]}]: {this.content}";
@@ -97,3 +98,7 @@ namespace TCPServer.Messaging
 		}
 	}
 }
+
+/*  Author: Sam Catcheside, A00115110
+ *  Date: 21/04/2024
+ */

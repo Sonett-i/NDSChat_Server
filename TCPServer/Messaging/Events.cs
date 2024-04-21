@@ -28,7 +28,12 @@ namespace TCPServer.Messaging
 			{
 				message.clientSocket.user.SetName(message.sender);
 				Server.connectedClients.AddUser(message.clientSocket);
+				Server.connectedClients.UpdateUser(message.clientSocket);
 			}
 		}
 	}
 }
+
+/*  Author: Sam Catcheside, A00115110
+ *  Date: 21/04/2024
+ */
