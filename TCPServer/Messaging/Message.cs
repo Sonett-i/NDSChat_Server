@@ -82,5 +82,13 @@ namespace TCPServer.Messaging
 		{
 			return $"[{this.clientSocket.user.GetName()}][{Message.messageTypes[this.messageType]}]: {this.content}";
 		}
+
+		public static void CommandMessage(ClientSocket client, string message)
+		{
+			Message commandMessage = new Message() { clientSocket = client, messageType = MessageType.MESSAGE_TYPE_COMMAND, sender = "Console" };
+			commandMessage.content = message;
+
+			commandMessage.Send(client);
+		}
 	}
 }

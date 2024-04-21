@@ -54,5 +54,38 @@ namespace TCPServer.ServerData
 
 			return false;
 		}
+
+		public bool Promote(ClientSocket client)
+		{
+			if ((int)(client.user.secLevel + 1) < Enum.GetNames(typeof(UserGroup.SecLevel)).Length)
+			{
+				client.user.secLevel++;
+				return true;
+
+			}
+			return false;
+		}
+
+		public bool Demote(ClientSocket client)
+		{
+			if ((int)(client.user.secLevel - 1) >= 0)
+			{
+				client.user.secLevel--;
+				return true;
+
+			}
+			return false;
+		}
+
+		public bool KickUser(ClientSocket sender, ClientSocket target)
+		{
+			if (sender.user.secLevel >= UserGroup.SecLevel.SEC_LVL_MODERATOR)
+			{
+
+				return true;
+			}
+
+			return false;
+		}
 	}
 }

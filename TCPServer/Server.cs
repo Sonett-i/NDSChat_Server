@@ -132,12 +132,15 @@ namespace TCPServer
         // Send to all
         public void SendToAll(Message message, ClientSocket sender)
         {
-            foreach (ClientSocket client in connectedClients.GetUsers())
-            {
-                if (client == sender)
-                    continue;
+            if (sender.user.isActive)
+			{
+                foreach (ClientSocket client in connectedClients.GetUsers())
+                {
+                    if (client == sender)
+                        continue;
 
-                message.Send(client);
+                    message.Send(client);
+                }
             }
         }
 

@@ -15,5 +15,13 @@ namespace TCPServer.Client
 			SEC_LVL_MODERATOR,
 			SEC_LVL_ADMIN
 		}
+
+		public static Dictionary<SecLevel, string> rankNames = new Dictionary<SecLevel, string>()
+		{
+			[SecLevel.SEC_LVL_GUEST] = "Guest",
+			[SecLevel.SEC_LVL_MEMBER] = "Member",
+			[SecLevel.SEC_LVL_MODERATOR] = "Moderator",
+			[SecLevel.SEC_LVL_ADMIN] = "Administrator",
+		};
 	}
 }

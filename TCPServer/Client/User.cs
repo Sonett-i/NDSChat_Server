@@ -12,7 +12,8 @@ namespace TCPServer.Client
 		int id;
 		string username = "guest";
 		public string remoteAddress = "";
-		UserGroup.SecLevel secLevel;
+		public UserGroup.SecLevel secLevel;
+		public bool isActive = true;
 
 		public User(string username, string IP)
 		{
@@ -55,6 +56,13 @@ namespace TCPServer.Client
 			{
 				// to-do server sets sec level.
 			}
+		}
+
+		public string UserInfo()
+		{
+			string output = $"Username: {username}\nIP: {remoteAddress}\nrank: {UserGroup.rankNames[secLevel]}";
+
+			return output;
 		}
 
 	}
