@@ -136,7 +136,7 @@ namespace TCPServer
 			{
                 foreach (ClientSocket client in connectedClients.GetUsers())
                 {
-                    if (client == sender)
+                    if (client == sender && message.messageType != Message.MessageType.MESSAGE_TYPE_ANNOUNCEMENT)
                         continue;
 
                     message.Send(client);

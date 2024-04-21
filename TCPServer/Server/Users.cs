@@ -87,5 +87,20 @@ namespace TCPServer.ServerData
 
 			return false;
 		}
+
+		public string GetMods()
+		{
+			string output = "";
+
+			foreach (ClientSocket client in connectedClients)
+			{
+				if (client.user.secLevel >= UserGroup.SecLevel.SEC_LVL_MODERATOR)
+				{
+					output += $"{client.user.GetName()} [{UserGroup.rankNames[client.user.secLevel]}]";
+				}
+			}
+
+			return output;
+		}
 	}
 }

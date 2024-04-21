@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using TCPServer.Logging;
 using TCPServer.Client;
 using TCPServer.Messaging;
-using TCPServer.Logging;
 
 namespace TCPServer.Messaging
 {
@@ -20,6 +19,7 @@ namespace TCPServer.Messaging
 			COMMAND_WHISPER,
 			COMMAND_PROMOTE,
 			COMMAND_DEMOTE,
+			COMMAND_MODS,
 			COMMAND_USERNAME,
 			COMMAND_COMMANDS,
 			COMMAND_KICK,
@@ -39,6 +39,7 @@ namespace TCPServer.Messaging
 			[Command.COMMAND_USERNAME] = "username",
 			[Command.COMMAND_KICK] = "kick",
 			[Command.COMMAND_COMMANDS] = "commands",
+			[Command.COMMAND_MODS] = "mods",
 		};
 
 		public static Dictionary<Command, string> commandDetails = new Dictionary<Command, string>()
@@ -52,9 +53,11 @@ namespace TCPServer.Messaging
 			[Command.COMMAND_USERNAME] = "Change your username.",
 			[Command.COMMAND_KICK] = "Kick another user.",
 			[Command.COMMAND_COMMANDS] = "Lists all available commands",
+			[Command.COMMAND_MODS] = "List available moderators",
 		};
 
 		public delegate Message CommandDelegate(Message message, string[] args);
+
 		// https://stackoverflow.com/questions/21924359/pass-a-dictionary-from-one-function-to-another-function-and-print-it
 		public static Dictionary<Command, CommandDelegate> commands = new Dictionary<Command, CommandDelegate>()
 		{
@@ -67,6 +70,7 @@ namespace TCPServer.Messaging
 			[Command.COMMAND_DEMOTE] = (message, args) => Demote(message, args),
 			[Command.COMMAND_COMMANDS] = (message, args) => ListCommands(message),
 			[Command.COMMAND_KICK] = (message, args) => Kick(message, args),
+			[Command.COMMAND_MODS] = (message, args) => Mods(message),
 		};
 
 		// iterates through commandStrings dictionary and returns enum if match.
@@ -116,6 +120,7 @@ namespace TCPServer.Messaging
 			return message;
 		}
 
+		
 		public static Message Who(Message message)
 		{
 			List<ClientSocket> clients = Server.connectedClients.GetUsers();
@@ -131,6 +136,7 @@ namespace TCPServer.Messaging
 			return message;
 		}
 
+		//task 1
 		public static Message Username(Message message, string[] args)
 		{
 			string newName = args[1];
@@ -147,12 +153,18 @@ namespace TCPServer.Messaging
 			}
 			else
 			{
-				message.content = $"Error: username taken.";
+				message.content = $"Error: username taken. Disconnecting you from server.";
+				Message.CommandMessage(message.clientSocket, $"Error: username taken. Disconnecting you from server.");
+				Message.CommandMessage(message.clientSocket, $"*KICKED");
+
+				message.clientSocket.user.isActive = false;
+				message.clientSocket.socket.Shutdown(System.Net.Sockets.SocketShutdown.Both);
 			}
 
 			return message;
 		}
 
+		// Task 4
 		public static Message ListCommands(Message message)
 		{
 			string output = "Commands: ";
@@ -167,6 +179,7 @@ namespace TCPServer.Messaging
 			return message;
 		}
 
+		// Task 4
 		public static Message Whisper(Message message, string[] args)
 		{
 			if (args.Length < 2)
@@ -197,12 +210,14 @@ namespace TCPServer.Messaging
 			return message;
 		}
 
+		// Task 4
 		public static Message About(Message message)
 		{
 			message.content = $"[NDSChat v.0.1]: a TCP chat application developed by Sam Catcheside, circa 2024 as part of the NDS203 subject at Torrens University.";
 			return message;
 		}
 
+		// Task 5
 		public static Message Promote(Message message, string[] args)
 		{
 			if (args.Length == 2)
@@ -230,6 +245,7 @@ namespace TCPServer.Messaging
 			return message;
 		}
 
+		// Task 5
 		public static Message Demote(Message message, string[] args)
 		{
 			if (args.Length == 2)
@@ -257,6 +273,7 @@ namespace TCPServer.Messaging
 			return message;
 		}
 
+		// Task 5
 		public static Message Kick(Message message, string[] args)
 		{
 			if (message.clientSocket.user.secLevel >= UserGroup.SecLevel.SEC_LVL_MODERATOR)
@@ -279,6 +296,9 @@ namespace TCPServer.Messaging
 							Message kickMessage = new Message() { clientSocket = message.clientSocket, messageType = Message.MessageType.MESSAGE_TYPE_COMMAND };
 							kickMessage.content = "You have been kicked from the server.";
 							kickMessage.Send(client);
+							kickMessage.content = "*KICKED";
+							kickMessage.Send(client);
+
 							client.user.isActive = false;
 							client.socket.Shutdown(System.Net.Sockets.SocketShutdown.Both);
 
@@ -305,6 +325,13 @@ namespace TCPServer.Messaging
 			return message;
 		}
 
+		// Task 5
+		public static Message Mods(Message message)
+		{
+			string mods = Server.connectedClients.GetMods();
+			message.content = "Available moderators: \n" + mods;
+			return message;
+		}
 		public static Message UserInfo(Message message, string[] args)
 		{
 			string target = "";

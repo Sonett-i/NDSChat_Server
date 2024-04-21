@@ -62,6 +62,11 @@ namespace TCPServer.Messaging
 
 		public void Send()
 		{
+			if (!clientSocket.user.isActive)
+			{
+				return;
+			}
+
 			string serialized = SerializedData.Serialize(this);
 
 			byte[] data = Encode(serialized);
